@@ -12,7 +12,7 @@ program
   .description(
     "Generate, validate, and evolve design ontologies — machine-traversable knowledge graphs encoding the reasoning behind design decisions."
   )
-  .version("0.1.2");
+  .version("0.1.3");
 
 registerValidateCommand(program);
 registerInitCommand(program);
