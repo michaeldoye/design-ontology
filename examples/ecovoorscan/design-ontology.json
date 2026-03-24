@@ -1,0 +1,451 @@
+{
+  "meta": {
+    "product": "EcoVoorscan",
+    "version": "1.0.0",
+    "generated": "2025-05-15T10:00:00Z",
+    "purpose": "Design reasoning for a Dutch sustainability assessment platform used by construction professionals and ecology consultants to evaluate environmental risk in construction projects.",
+    "schema_version": "1.0.0"
+  },
+  "nodes": {
+    "intents": {
+      "INT-001": {
+        "id": "INT-001",
+        "label": "Risk Assessment Review",
+        "short": "Risk review",
+        "description": "Construction professionals need to immediately see overall project risk and drill into specific risk categories to make go/no-go decisions.",
+        "connects_to": ["PSY-001", "PSY-002", "EMO-001", "CUL-001"],
+        "principle": "Risk visibility drives informed decision-making under time pressure",
+        "implication": "Overall risk score must be visible within 2 seconds of opening a project",
+        "phase": "active-use",
+        "rule": "Risk score is the first element in the visual hierarchy on every project page"
+      },
+      "INT-002": {
+        "id": "INT-002",
+        "label": "Project Comparison",
+        "short": "Compare projects",
+        "description": "Compare risk profiles across multiple construction sites to prioritize which projects need immediate attention during weekly planning.",
+        "connects_to": ["PSY-003", "PSY-001", "CUL-002"],
+        "principle": "Comparison requires consistent visual encoding across items",
+        "implication": "All project cards must use identical layout, scale, and color mapping",
+        "phase": "active-use"
+      },
+      "INT-003": {
+        "id": "INT-003",
+        "label": "Report Generation",
+        "short": "Generate reports",
+        "description": "Generate PDF reports conforming to Dutch environmental reporting standards for regulatory submission.",
+        "connects_to": ["PSY-004", "CUL-003", "AUD-002"],
+        "principle": "Regulatory output must be predictable and inspectable before submission",
+        "implication": "Preview report before generating; show exactly what will be submitted"
+      },
+      "INT-004": {
+        "id": "INT-004",
+        "label": "Field Data Entry",
+        "short": "Data entry",
+        "description": "Ecology consultants enter field survey data on tablets in outdoor conditions with potential gloved interaction.",
+        "connects_to": ["PSY-005", "AUD-002", "EMO-003"],
+        "principle": "Data entry in adverse conditions requires large targets and immediate validation",
+        "implication": "Touch targets minimum 48px, inline validation on every field",
+        "phase": "active-use",
+        "state": "input"
+      },
+      "INT-005": {
+        "id": "INT-005",
+        "label": "Risk Category Deep Dive",
+        "short": "Category detail",
+        "description": "After seeing the overall risk, users drill into specific categories (soil, species, noise, water) to understand contributing factors and required actions.",
+        "connects_to": ["PSY-002", "PSY-001", "VIS-005"],
+        "principle": "Progressive disclosure from summary to detail reduces cognitive overload",
+        "implication": "Category pages show summary metrics first, expandable sections for detail"
+      }
+    },
+    "psychology": {
+      "PSY-001": {
+        "id": "PSY-001",
+        "label": "Cognitive Load Management",
+        "short": "Cognitive load",
+        "description": "Construction professionals process complex multi-variable environmental data under time pressure. Cognitive load must be actively managed.",
+        "connects_to": ["VIS-001", "VIS-002", "VIS-005"],
+        "principle": "Progressive disclosure reduces cognitive overload in data-dense environments",
+        "implication": "Show summary first, details on demand. Never show all variables simultaneously.",
+        "anti_pattern": "Showing all data fields on a single screen without hierarchy"
+      },
+      "PSY-002": {
+        "id": "PSY-002",
+        "label": "Visual Hierarchy for Scanning",
+        "short": "Visual hierarchy",
+        "description": "Users scan risk data in an F-pattern. Critical risk information must occupy the top-left quadrant and use size/color to stand out.",
+        "connects_to": ["VIS-001", "VIS-003"],
+        "principle": "Leverage natural F-pattern scanning for critical information placement",
+        "implication": "Risk scores top-left, largest font size. Supporting data flows below and right."
+      },
+      "PSY-003": {
+        "id": "PSY-003",
+        "label": "Comparison Cognition",
+        "short": "Comparison",
+        "description": "Comparing multiple risk profiles requires aligned visual dimensions. Misaligned scales or layouts break comparative judgment.",
+        "connects_to": ["VIS-006"],
+        "principle": "Consistent encoding across compared items enables rapid judgment",
+        "implication": "Project comparison cards must have identical structure, scale, and color mapping"
+      },
+      "PSY-004": {
+        "id": "PSY-004",
+        "label": "Regulatory Confidence",
+        "short": "Reg. confidence",
+        "description": "Submitting regulatory reports is high-stakes. Users need to feel certain the output is correct and complete before submission.",
+        "connects_to": ["VIS-007", "EMO-002"],
+        "principle": "Uncertainty in high-stakes actions causes paralysis",
+        "implication": "Show completeness checklist and preview before report generation"
+      },
+      "PSY-005": {
+        "id": "PSY-005",
+        "label": "Error Prevention in Data Entry",
+        "short": "Error prevention",
+        "description": "Field data entry errors are costly to correct later. Prevent errors at input time with constraints and validation.",
+        "connects_to": ["VIS-008", "A11Y-003"],
+        "principle": "Prevention is cheaper than correction in field-collected data",
+        "implication": "Constrained inputs (dropdowns, ranges) over free text. Inline validation."
+      }
+    },
+    "culture": {
+      "CUL-001": {
+        "id": "CUL-001",
+        "label": "Dutch Directness",
+        "short": "Dutch directness",
+        "description": "Dutch professional culture values direct, unambiguous communication. Risk labels should state the fact without hedging or euphemism.",
+        "connects_to": ["VIS-003", "VIS-004"],
+        "principle": "State risk directly — 'High risk' not 'Elevated concern level'",
+        "implication": "Use plain Dutch risk terminology. No softening language.",
+        "linguistic_examples": ["Hoog risico", "Actie vereist", "Veilig", "Niet conform"]
+      },
+      "CUL-002": {
+        "id": "CUL-002",
+        "label": "Data-Dense Professional Tools",
+        "short": "Data density",
+        "description": "Dutch construction professionals expect information density similar to engineering tools like AutoCAD or Revit, not consumer app spaciousness.",
+        "connects_to": ["VIS-001", "VIS-002"],
+        "principle": "Information density signals professionalism and respect for expertise",
+        "implication": "Compact spacing, smaller body text, dense tables. Whitespace is for structure, not decoration."
+      },
+      "CUL-003": {
+        "id": "CUL-003",
+        "label": "Dutch Regulatory Formality",
+        "short": "Regulatory formality",
+        "description": "Dutch environmental regulations (Wet natuurbescherming, EU directives) require precise, formal documentation. Reports must match expected bureaucratic format.",
+        "connects_to": ["VIS-007"],
+        "principle": "Regulatory output format is non-negotiable and culturally prescribed",
+        "implication": "Report layout follows Dutch regulatory conventions exactly"
+      },
+      "CUL-004": {
+        "id": "CUL-004",
+        "label": "Color Semantics in Dutch Construction",
+        "short": "Color semantics",
+        "description": "In Dutch construction, red/yellow/green have specific regulatory weight beyond general UX conventions. Red means stop-work, not just 'attention needed'.",
+        "connects_to": ["VIS-003", "A11Y-001"],
+        "principle": "Color semantics must match industry-specific regulatory meaning",
+        "implication": "Red = stop/prohibited, Orange = action required, Yellow = caution, Green = proceed"
+      }
+    },
+    "emotions": {
+      "EMO-001": {
+        "id": "EMO-001",
+        "label": "Controlled Urgency",
+        "short": "Controlled urgency",
+        "description": "High-risk findings should create appropriate urgency without panic. The interface must project control even when delivering alarming data.",
+        "connects_to": ["VIS-003", "VIS-004"],
+        "principle": "Professional urgency through structure, not alarm",
+        "implication": "Use color and prominence to signal severity, but maintain clean layout. No flashing, no exclamation marks."
+      },
+      "EMO-002": {
+        "id": "EMO-002",
+        "label": "Submission Confidence",
+        "short": "Confidence",
+        "description": "Users submitting regulatory reports need to feel confident the data is complete and correct. Uncertainty leads to re-checking loops.",
+        "connects_to": ["VIS-007"],
+        "principle": "Confidence comes from visible completeness, not reassuring language",
+        "implication": "Show completion percentage, checklist of required sections, preview of final output"
+      },
+      "EMO-003": {
+        "id": "EMO-003",
+        "label": "Field Work Frustration Prevention",
+        "short": "Frustration prevention",
+        "description": "Data entry in field conditions (rain, cold, gloves) is inherently frustrating. The interface must minimize friction, not add to it.",
+        "connects_to": ["VIS-008", "A11Y-003"],
+        "principle": "Every unnecessary tap in field conditions is a frustration multiplier",
+        "implication": "Minimize required taps. Auto-save. Large targets. Smart defaults."
+      }
+    },
+    "audience": {
+      "AUD-001": {
+        "id": "AUD-001",
+        "label": "Construction Professional",
+        "short": "Construction pro",
+        "description": "Site managers and project leads with 10-30 years experience. Highly technical, time-pressured, accustomed to data-dense engineering tools.",
+        "connects_to": ["VIS-001", "VIS-002", "VIS-003"],
+        "role": "Site manager / project lead",
+        "expertise": "expert",
+        "constraints": ["Field use on tablets", "Office use on desktop", "Dutch-speaking", "Time-pressured"]
+      },
+      "AUD-002": {
+        "id": "AUD-002",
+        "label": "Ecology Consultant",
+        "short": "Ecologist",
+        "description": "Environmental scientists conducting field surveys and validating assessment outputs. Detail-oriented, comfortable with scientific data, works in field conditions.",
+        "connects_to": ["VIS-008", "VIS-005"],
+        "role": "Environmental scientist / field surveyor",
+        "expertise": "expert",
+        "constraints": ["Tablet in field conditions", "Gloved interaction", "Variable lighting", "Scientific data formats"]
+      }
+    },
+    "visual_properties": {
+      "VIS-001": {
+        "id": "VIS-001",
+        "label": "Data-Dense Layout System",
+        "short": "Dense layout",
+        "description": "A compact, information-dense layout with minimal decorative whitespace, optimized for professional data consumption.",
+        "connects_to": ["A11Y-002"],
+        "specification": "max-width: 1400px; grid gap: 12px; padding: 16px; card padding: 12px 16px",
+        "property_type": "layout",
+        "derived_from": ["PSY-001", "CUL-002", "AUD-001"],
+        "reasoning": "Construction professionals expect data density similar to engineering tools. Consumer-app spacing wastes valuable screen real estate and slows scanning."
+      },
+      "VIS-002": {
+        "id": "VIS-002",
+        "label": "Professional Typography Scale",
+        "short": "Typography",
+        "description": "A compact typography scale with clear hierarchy, optimized for data scanning rather than reading comfort.",
+        "connects_to": ["A11Y-002"],
+        "specification": "risk-score: 32px/700; section-header: 16px/600; body: 14px/400; data-label: 12px/500; data-value: 14px/600. Font: system-ui.",
+        "property_type": "typography",
+        "derived_from": ["PSY-001", "PSY-002", "CUL-002"],
+        "reasoning": "Smaller body text than consumer apps, but clear hierarchy via weight and size differentiation. System font for reliability."
+      },
+      "VIS-003": {
+        "id": "VIS-003",
+        "label": "Risk Severity Color System",
+        "short": "Risk colors",
+        "description": "A four-tier color system matching Dutch construction regulatory conventions for risk communication.",
+        "connects_to": ["A11Y-001"],
+        "specification": "critical/stop: #DC2626; action-required: #EA580C; caution: #CA8A04; safe/proceed: #16A34A. Each with icon + text label.",
+        "property_type": "color",
+        "derived_from": ["CUL-004", "CUL-001", "EMO-001"],
+        "reasoning": "Colors match Dutch construction industry conventions where red means stop-work order, not just attention. Always paired with icon and text for accessibility."
+      },
+      "VIS-004": {
+        "id": "VIS-004",
+        "label": "Risk Communication Microcopy",
+        "short": "Risk labels",
+        "description": "Direct, unhedged Dutch-language risk labels and action descriptions matching professional expectations.",
+        "connects_to": [],
+        "specification": "Risk levels: 'Hoog risico', 'Actie vereist', 'Let op', 'Veilig'. Actions: imperative form, max 8 words.",
+        "property_type": "content",
+        "derived_from": ["CUL-001", "EMO-001"],
+        "reasoning": "Dutch directness requires stating risk plainly. Hedging language ('slightly elevated') undermines trust and delays action."
+      },
+      "VIS-005": {
+        "id": "VIS-005",
+        "label": "Progressive Disclosure Pattern",
+        "short": "Disclosure pattern",
+        "description": "Summary-to-detail drill-down pattern: overview cards with key metrics, expandable to full category detail.",
+        "connects_to": ["A11Y-004"],
+        "specification": "Level 1: risk score + category name + trend arrow. Level 2: expand to metrics table + contributing factors. Level 3: link to full category page.",
+        "property_type": "interaction",
+        "derived_from": ["PSY-001", "PSY-002", "INT-005"],
+        "reasoning": "Three-level disclosure matches the mental model of construction professionals: quick scan, evaluate, then deep dive only if needed."
+      },
+      "VIS-006": {
+        "id": "VIS-006",
+        "label": "Comparison Grid Layout",
+        "short": "Comparison grid",
+        "description": "Horizontally aligned project cards with consistent structure for side-by-side risk comparison.",
+        "connects_to": ["A11Y-002"],
+        "specification": "grid-template-columns: repeat(auto-fill, minmax(280px, 1fr)); consistent card height via min-height; identical internal layout per card",
+        "property_type": "layout",
+        "derived_from": ["PSY-003", "INT-002"],
+        "reasoning": "Comparison requires visual alignment. Cards with different layouts break the user's ability to compare at a glance."
+      },
+      "VIS-007": {
+        "id": "VIS-007",
+        "label": "Report Preview and Confidence UI",
+        "short": "Report preview",
+        "description": "Pre-submission UI showing completeness checklist, preview of the exact output, and clear submit action.",
+        "connects_to": [],
+        "specification": "Completeness indicator: segmented progress bar. Preview: paginated PDF-like view. Submit: primary button, disabled until 100% complete.",
+        "property_type": "interaction",
+        "derived_from": ["PSY-004", "EMO-002", "CUL-003"],
+        "reasoning": "Regulatory submission is high-stakes. Users need visible proof of completeness and an exact preview to submit with confidence."
+      },
+      "VIS-008": {
+        "id": "VIS-008",
+        "label": "Field-Optimized Input Controls",
+        "short": "Field inputs",
+        "description": "Large, constrained input controls optimized for tablet use in outdoor conditions with potential gloved interaction.",
+        "connects_to": ["A11Y-003"],
+        "specification": "min touch target: 48px; input height: 48px; dropdown over free text; inline validation; auto-save on blur; high-contrast borders",
+        "property_type": "interaction",
+        "derived_from": ["PSY-005", "EMO-003", "AUD-002"],
+        "reasoning": "Field conditions make precise touch difficult. Large targets, constrained inputs, and auto-save prevent data loss and reduce frustration."
+      }
+    },
+    "accessibility": {
+      "A11Y-001": {
+        "id": "A11Y-001",
+        "label": "Color-Independent Risk Communication",
+        "short": "Color independence",
+        "description": "Risk levels must be communicated through icon shape, text label, and color together. Color alone is never sufficient.",
+        "connects_to": [],
+        "specification": "Every risk level: unique icon shape + text label + color. Icons: octagon (stop), triangle (warning), circle-info (caution), checkmark (safe).",
+        "rule": "Never use color as the sole indicator of risk severity",
+        "derived_from": ["VIS-003", "CUL-004"]
+      },
+      "A11Y-002": {
+        "id": "A11Y-002",
+        "label": "WCAG AA Contrast in Dense Layout",
+        "short": "AA contrast",
+        "description": "All text must meet WCAG 2.1 AA contrast ratios even in the compact, data-dense layout with small font sizes.",
+        "connects_to": [],
+        "specification": "Normal text (< 18px): 4.5:1 minimum. Large text (>= 18px bold): 3:1 minimum. UI components: 3:1 against adjacent colors.",
+        "rule": "Test all text/background combinations at the smallest font size used (12px data labels)"
+      },
+      "A11Y-003": {
+        "id": "A11Y-003",
+        "label": "Touch Target Sizing for Field Use",
+        "short": "Touch targets",
+        "description": "All interactive elements must meet minimum touch target sizes for use with gloves and in challenging field conditions.",
+        "connects_to": [],
+        "specification": "Minimum touch target: 48x48px with 8px gap between targets. Buttons: min-height 48px. Form inputs: min-height 48px.",
+        "rule": "No interactive element may be smaller than 48x48px in field-facing views"
+      },
+      "A11Y-004": {
+        "id": "A11Y-004",
+        "label": "Screen Reader Support for Reports",
+        "short": "Screen reader",
+        "description": "Report pages must be fully navigable by screen reader with proper heading hierarchy, landmark regions, and data table markup.",
+        "connects_to": [],
+        "specification": "Semantic HTML: h1-h3 hierarchy, nav/main/aside landmarks, caption + th scope on data tables, aria-live for dynamic risk updates.",
+        "rule": "All report pages must pass axe-core automated testing with zero violations"
+      }
+    }
+  },
+  "edges": {
+    "reasoning_chains": [
+      {
+        "id": "CHAIN-001",
+        "name": "Risk Assessment to Visual Hierarchy",
+        "path": ["INT-001", "PSY-002", "PSY-001", "CUL-002", "VIS-001", "VIS-002", "A11Y-002"],
+        "description": "From the core risk assessment intent through visual scanning psychology and Dutch data density expectations to a compact, accessible layout with professional typography.",
+        "weight": 5
+      },
+      {
+        "id": "CHAIN-002",
+        "name": "Risk Communication to Color System",
+        "path": ["INT-001", "CUL-004", "CUL-001", "EMO-001", "VIS-003", "A11Y-001"],
+        "description": "From risk assessment through Dutch construction color conventions and directness culture to a four-tier color system with icon and text redundancy for accessibility.",
+        "weight": 5
+      },
+      {
+        "id": "CHAIN-003",
+        "name": "Risk Drill-Down to Progressive Disclosure",
+        "path": ["INT-005", "PSY-001", "PSY-002", "VIS-005", "A11Y-004"],
+        "description": "From the category deep-dive intent through cognitive load management to a three-level progressive disclosure pattern with screen reader support.",
+        "weight": 4
+      },
+      {
+        "id": "CHAIN-004",
+        "name": "Project Comparison to Grid Layout",
+        "path": ["INT-002", "PSY-003", "CUL-002", "VIS-006", "A11Y-002"],
+        "description": "From project comparison needs through comparison cognition and data density culture to a consistent, accessible comparison grid.",
+        "weight": 4
+      },
+      {
+        "id": "CHAIN-005",
+        "name": "Report Generation to Confidence UI",
+        "path": ["INT-003", "PSY-004", "EMO-002", "CUL-003", "VIS-007"],
+        "description": "From report generation through regulatory confidence psychology and Dutch formality norms to a completeness-checklist UI with preview.",
+        "weight": 4
+      },
+      {
+        "id": "CHAIN-006",
+        "name": "Field Data Entry to Optimized Controls",
+        "path": ["INT-004", "PSY-005", "EMO-003", "AUD-002", "VIS-008", "A11Y-003"],
+        "description": "From field data entry through error prevention psychology and field frustration to large, constrained, auto-saving input controls with adequate touch targets.",
+        "weight": 5
+      },
+      {
+        "id": "CHAIN-007",
+        "name": "Dutch Directness to Risk Microcopy",
+        "path": ["INT-001", "CUL-001", "EMO-001", "VIS-004"],
+        "description": "From risk assessment through Dutch directness culture and controlled urgency to plain, unhedged Dutch risk labels.",
+        "weight": 3
+      },
+      {
+        "id": "CHAIN-008",
+        "name": "Audience Expertise to Data Density",
+        "path": ["AUD-001", "CUL-002", "PSY-001", "VIS-001"],
+        "description": "From construction professional expertise through cultural expectations of data density to compact layout optimized for expert users.",
+        "weight": 4
+      }
+    ]
+  },
+  "anti_patterns": {
+    "ANTI-001": {
+      "label": "Generic SaaS Dashboard",
+      "description": "Using a standard SaaS dashboard grid with large cards, excessive whitespace, customizable widgets, and drag-and-drop layout.",
+      "why_prohibited": "Construction professionals need task-oriented, data-dense interfaces. Generic dashboards waste screen space, slow down risk scanning, and signal consumer-grade tooling that undermines professional trust.",
+      "traces_to": ["INT-001", "AUD-001", "CUL-002", "VIS-001"]
+    },
+    "ANTI-002": {
+      "label": "Decorative Animations",
+      "description": "Using transitions, loading animations, or micro-interactions that serve aesthetic rather than functional purposes.",
+      "why_prohibited": "Every animation adds latency to safety-critical risk data. Construction professionals interpret delays as unreliability. Functional feedback (progress bars, spinners during load) is fine; decorative motion is waste.",
+      "traces_to": ["INT-001", "AUD-001", "PSY-001", "VIS-001"]
+    },
+    "ANTI-003": {
+      "label": "Softened Risk Language",
+      "description": "Using hedging or softening language for risk levels: 'slightly elevated', 'area of concern', 'potential issue'.",
+      "why_prohibited": "Dutch construction culture demands directness. Softened language delays action, creates ambiguity in safety-critical decisions, and undermines user trust in the platform's authority.",
+      "traces_to": ["CUL-001", "EMO-001", "VIS-004"]
+    },
+    "ANTI-004": {
+      "label": "Color-Only Risk Indication",
+      "description": "Using color as the sole differentiator between risk levels without icon or text redundancy.",
+      "why_prohibited": "Violates WCAG accessibility requirements. Approximately 8% of men have color vision deficiency. Risk indication must use color + icon shape + text label together.",
+      "traces_to": ["VIS-003", "A11Y-001"]
+    },
+    "ANTI-005": {
+      "label": "Onboarding Wizards and Tutorials",
+      "description": "Adding step-by-step onboarding flows, feature tours, or tutorial overlays.",
+      "why_prohibited": "Expert users with 10-30 years experience find onboarding patronizing. The interface should be self-evident to domain experts. A professional tool teaches through use, not through wizards.",
+      "traces_to": ["AUD-001", "CUL-001"]
+    },
+    "ANTI-006": {
+      "label": "Small Touch Targets in Field Views",
+      "description": "Using standard web input sizes (32px height, 4px spacing) for field-facing data entry views.",
+      "why_prohibited": "Field conditions (gloves, rain, shaking) make precise touch impossible. Undersized targets cause input errors that are expensive to correct after the field visit.",
+      "traces_to": ["INT-004", "AUD-002", "VIS-008", "A11Y-003"]
+    }
+  },
+  "generation_instructions": {
+    "process": [
+      "1. Identify which user intent the component serves (INT-001 through INT-005)",
+      "2. Use resolve_for_component or traverse from that intent to find visual properties",
+      "3. Check the component description against anti-patterns using check_anti_patterns",
+      "4. Apply the resolved visual properties: layout (VIS-001/006), typography (VIS-002), colors (VIS-003), content (VIS-004), interaction patterns (VIS-005/007/008)",
+      "5. Ensure accessibility nodes are respected: color independence (A11Y-001), contrast (A11Y-002), touch targets (A11Y-003), screen reader (A11Y-004)",
+      "6. Use Dutch-language labels where the spec indicates (VIS-004 linguistic_examples)"
+    ],
+    "example_traversal": {
+      "component": "Risk score card on project overview",
+      "starting_intent": "INT-001",
+      "chain_used": "CHAIN-001 (weight 5) and CHAIN-002 (weight 5)",
+      "path": ["INT-001", "PSY-002", "VIS-001", "VIS-002", "VIS-003"],
+      "resolved_properties": {
+        "layout": "Dense layout (VIS-001): 12px grid gap, 12px/16px card padding",
+        "typography": "Risk score at 32px/700, category headers at 16px/600 (VIS-002)",
+        "colors": "Four-tier risk colors with icon + text (VIS-003)",
+        "labels": "Dutch direct labels: 'Hoog risico', 'Actie vereist' (VIS-004)"
+      },
+      "anti_patterns_checked": ["ANTI-001 (no generic dashboard)", "ANTI-003 (no softened language)", "ANTI-004 (no color-only risk)"]
+    }
+  }
+}

@@ -1,0 +1,6 @@
+/AIcontext
+.idea
+node_modules
+dist
+.env
+*.tsbuildinfo

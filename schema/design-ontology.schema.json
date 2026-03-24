@@ -1,0 +1,375 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://design-ontology.dev/schema/v1/design-ontology.schema.json",
+  "title": "Design Ontology",
+  "description": "A machine-traversable knowledge graph encoding the reasoning behind design decisions — from user intent through psychology, culture, and audience to concrete visual properties.",
+  "type": "object",
+  "required": ["meta", "nodes", "edges"],
+  "additionalProperties": false,
+  "properties": {
+    "meta": {
+      "$ref": "#/$defs/meta"
+    },
+    "nodes": {
+      "$ref": "#/$defs/nodes"
+    },
+    "edges": {
+      "$ref": "#/$defs/edges"
+    },
+    "anti_patterns": {
+      "title": "Anti-Patterns",
+      "description": "Design decisions explicitly prohibited by this ontology. Keys are anti-pattern IDs (ANTI-xxx format).",
+      "type": "object",
+      "propertyNames": {
+        "pattern": "^ANTI-\\d{3}$"
+      },
+      "additionalProperties": {
+        "$ref": "#/$defs/anti_pattern"
+      }
+    },
+    "generation_instructions": {
+      "$ref": "#/$defs/generation_instructions"
+    }
+  },
+  "$defs": {
+    "meta": {
+      "title": "Ontology Metadata",
+      "description": "Metadata describing the ontology: what product it serves, when it was generated, and its version.",
+      "type": "object",
+      "required": ["product", "version", "generated", "purpose"],
+      "additionalProperties": false,
+      "properties": {
+        "product": {
+          "title": "Product Name",
+          "description": "The name of the product this ontology describes.",
+          "type": "string",
+          "minLength": 1
+        },
+        "version": {
+          "title": "Ontology Version",
+          "description": "Semantic version of this ontology file (e.g., \"1.0.0\").",
+          "type": "string",
+          "pattern": "^\\d+\\.\\d+\\.\\d+$"
+        },
+        "generated": {
+          "title": "Generation Date",
+          "description": "ISO 8601 date string indicating when this ontology was generated or last updated.",
+          "type": "string",
+          "format": "date-time"
+        },
+        "purpose": {
+          "title": "Ontology Purpose",
+          "description": "A brief statement of what this ontology encodes and why it exists for this product.",
+          "type": "string",
+          "minLength": 1
+        },
+        "schema_version": {
+          "title": "Schema Version",
+          "description": "The version of the design-ontology schema this file conforms to. Used for future migration support.",
+          "type": "string",
+          "pattern": "^\\d+\\.\\d+\\.\\d+$"
+        }
+      }
+    },
+    "node_id": {
+      "title": "Node ID",
+      "description": "A unique identifier for a node. Format: starts with an uppercase letter, followed by 1-4 uppercase letters or digits, then a hyphen and 3 digits (e.g., INT-001, PSY-012, VIS-003, A11Y-001).",
+      "type": "string",
+      "pattern": "^[A-Z][A-Z0-9]{1,4}-\\d{3}$"
+    },
+    "base_node": {
+      "title": "Base Node",
+      "description": "The base structure shared by all ontology nodes. Every node must have an ID, label, description, and a list of outgoing connections.",
+      "type": "object",
+      "required": ["id", "label", "description", "connects_to"],
+      "properties": {
+        "id": {
+          "title": "Node ID",
+          "description": "The unique identifier for this node. Must match the key under which this node is stored in its domain group.",
+          "$ref": "#/$defs/node_id"
+        },
+        "label": {
+          "title": "Node Label",
+          "description": "A human-readable name for this node (e.g., \"Risk Assessment\", \"Visual Hierarchy\").",
+          "type": "string",
+          "minLength": 1
+        },
+        "description": {
+          "title": "Node Description",
+          "description": "A detailed explanation of what this node represents and why it exists in the ontology.",
+          "type": "string",
+          "maxLength": 500
+        },
+        "short": {
+          "title": "Short Description",
+          "description": "A concise label for use in visualizations and compact displays.",
+          "type": "string",
+          "maxLength": 50
+        },
+        "connects_to": {
+          "title": "Outgoing Connections",
+          "description": "Array of node IDs that this node connects to. Represents directional relationships in the ontology graph. Referential integrity: every ID listed here must exist as a node key somewhere in the nodes section. This constraint is enforced programmatically, not by this schema.",
+          "type": "array",
+          "items": {
+            "$ref": "#/$defs/node_id"
+          }
+        },
+        "principle": {
+          "title": "Design Principle",
+          "description": "The design principle this node embodies (e.g., \"Progressive disclosure reduces cognitive load\").",
+          "type": "string"
+        },
+        "implication": {
+          "title": "Design Implication",
+          "description": "What this node implies for the design — the actionable consequence of the principle.",
+          "type": "string"
+        },
+        "anti_pattern": {
+          "title": "Anti-Pattern Reference",
+          "description": "A brief description of the design anti-pattern associated with this node — what NOT to do.",
+          "type": "string"
+        },
+        "specification": {
+          "title": "Specification",
+          "description": "A concrete specification or value for this node (e.g., \"font-size: 16px\", \"border-radius: 8px\").",
+          "type": "string"
+        },
+        "property_type": {
+          "title": "Property Type",
+          "description": "The type of visual property this node represents (e.g., \"color\", \"typography\", \"spacing\", \"layout\").",
+          "type": "string"
+        },
+        "derived_from": {
+          "title": "Derived From",
+          "description": "Array of node IDs that this node's reasoning is derived from. Referential integrity: every ID must exist as a node key. Enforced programmatically.",
+          "type": "array",
+          "items": {
+            "$ref": "#/$defs/node_id"
+          }
+        },
+        "reasoning": {
+          "title": "Reasoning",
+          "description": "The reasoning chain that led to this node's inclusion — why this design decision was made.",
+          "type": "string"
+        },
+        "rule": {
+          "title": "Rule",
+          "description": "A concrete, implementable rule derived from this node (e.g., \"Always show confidence intervals alongside risk scores\").",
+          "type": "string"
+        },
+        "phase": {
+          "title": "Phase",
+          "description": "The user journey phase this node applies to (e.g., \"onboarding\", \"active-use\", \"error-recovery\").",
+          "type": "string"
+        },
+        "state": {
+          "title": "State",
+          "description": "The UI or user state this node is relevant to (e.g., \"loading\", \"empty\", \"error\", \"success\").",
+          "type": "string"
+        },
+        "ui_response": {
+          "title": "UI Response",
+          "description": "How the UI should respond when this node's conditions are met.",
+          "type": "string"
+        },
+        "role": {
+          "title": "Role",
+          "description": "The user role or persona this node is most relevant to.",
+          "type": "string"
+        },
+        "expertise": {
+          "title": "Expertise Level",
+          "description": "The expertise level assumed for this node (e.g., \"novice\", \"intermediate\", \"expert\").",
+          "type": "string"
+        },
+        "constraints": {
+          "title": "Constraints",
+          "description": "Technical or design constraints that apply to this node.",
+          "type": "array",
+          "items": {
+            "type": "string"
+          }
+        },
+        "linguistic_examples": {
+          "title": "Linguistic Examples",
+          "description": "Example phrases, labels, or microcopy that embody this node's intent or tone.",
+          "type": "array",
+          "items": {
+            "type": "string"
+          }
+        }
+      },
+      "additionalProperties": false
+    },
+    "domain_group": {
+      "title": "Domain Group",
+      "description": "A collection of nodes within a single domain. Keys are node IDs, values are node objects.",
+      "type": "object",
+      "propertyNames": {
+        "$ref": "#/$defs/node_id"
+      },
+      "additionalProperties": {
+        "$ref": "#/$defs/base_node"
+      }
+    },
+    "nodes": {
+      "title": "Ontology Nodes",
+      "description": "All nodes in the ontology, organized by domain group. The seven domains represent layers of design reasoning: from user intents through psychological and cultural factors to concrete visual properties and accessibility requirements.",
+      "type": "object",
+      "required": ["intents", "psychology", "culture", "emotions", "audience", "visual_properties", "accessibility"],
+      "additionalProperties": false,
+      "properties": {
+        "intents": {
+          "title": "Intent Nodes",
+          "description": "User intents — what users are trying to accomplish. These are the starting points for reasoning chains. Nodes use INT-xxx IDs.",
+          "$ref": "#/$defs/domain_group"
+        },
+        "psychology": {
+          "title": "Psychology Nodes",
+          "description": "Cognitive and psychological principles that influence design decisions (e.g., cognitive load, attention patterns, trust formation). Nodes use PSY-xxx IDs.",
+          "$ref": "#/$defs/domain_group"
+        },
+        "culture": {
+          "title": "Culture Nodes",
+          "description": "Cultural context and conventions that shape how design is perceived by the target audience (e.g., color associations, reading patterns, formality expectations). Nodes use CUL-xxx IDs.",
+          "$ref": "#/$defs/domain_group"
+        },
+        "emotions": {
+          "title": "Emotion Nodes",
+          "description": "Emotional states and responses the design should evoke, manage, or support (e.g., trust, anxiety reduction, confidence). Nodes use EMO-xxx IDs.",
+          "$ref": "#/$defs/domain_group"
+        },
+        "audience": {
+          "title": "Audience Nodes",
+          "description": "Target audience segments and their characteristics, expertise levels, and needs. Nodes use AUD-xxx IDs.",
+          "$ref": "#/$defs/domain_group"
+        },
+        "visual_properties": {
+          "title": "Visual Property Nodes",
+          "description": "Concrete visual specifications derived from the reasoning chains — colors, typography, spacing, layout, and other implementable properties. These are typically the endpoints of reasoning chains. Nodes use VIS-xxx IDs.",
+          "$ref": "#/$defs/domain_group"
+        },
+        "accessibility": {
+          "title": "Accessibility Nodes",
+          "description": "Accessibility requirements, guidelines, and considerations that constrain and inform visual property decisions. Nodes use A11Y-xxx IDs.",
+          "$ref": "#/$defs/domain_group"
+        }
+      }
+    },
+    "reasoning_chain": {
+      "title": "Reasoning Chain",
+      "description": "A named path through the ontology graph connecting nodes from intent to visual properties. Chains encode the WHY behind design decisions — the reasoning path from what a user wants to accomplish to the concrete visual properties that support it.",
+      "type": "object",
+      "required": ["id", "name", "path", "description", "weight"],
+      "additionalProperties": false,
+      "properties": {
+        "id": {
+          "title": "Chain ID",
+          "description": "Unique identifier for this reasoning chain (CHAIN-xxx format).",
+          "type": "string",
+          "pattern": "^CHAIN-\\d{3}$"
+        },
+        "name": {
+          "title": "Chain Name",
+          "description": "A human-readable name describing the reasoning path (e.g., \"Risk Assessment to Visual Hierarchy\").",
+          "type": "string",
+          "minLength": 1
+        },
+        "path": {
+          "title": "Chain Path",
+          "description": "Ordered array of node IDs forming the reasoning path. Typically starts with an intent node and ends with visual property nodes, passing through psychology, culture, emotion, and audience nodes. Minimum 3 nodes. Referential integrity: every ID must exist as a node key. Enforced programmatically.",
+          "type": "array",
+          "items": {
+            "$ref": "#/$defs/node_id"
+          },
+          "minItems": 3
+        },
+        "description": {
+          "title": "Chain Description",
+          "description": "A narrative explanation of the reasoning this chain represents — why these nodes connect in this order.",
+          "type": "string"
+        },
+        "weight": {
+          "title": "Chain Weight",
+          "description": "Importance weight from 1 (supplementary) to 5 (critical). Higher-weight chains take priority when reasoning conflicts arise.",
+          "type": "integer",
+          "minimum": 1,
+          "maximum": 5
+        }
+      }
+    },
+    "edges": {
+      "title": "Ontology Edges",
+      "description": "Edges connecting nodes across the ontology. Currently contains reasoning chains — named, weighted paths through the graph.",
+      "type": "object",
+      "required": ["reasoning_chains"],
+      "additionalProperties": false,
+      "properties": {
+        "reasoning_chains": {
+          "title": "Reasoning Chains",
+          "description": "Array of reasoning chains, each representing a named path from intent to visual properties through intermediate reasoning nodes.",
+          "type": "array",
+          "items": {
+            "$ref": "#/$defs/reasoning_chain"
+          }
+        }
+      }
+    },
+    "anti_pattern": {
+      "title": "Anti-Pattern",
+      "description": "A design decision explicitly prohibited by this ontology. Anti-patterns encode what NOT to do and trace back to the nodes whose principles they violate.",
+      "type": "object",
+      "required": ["label", "description", "why_prohibited", "traces_to"],
+      "additionalProperties": false,
+      "properties": {
+        "label": {
+          "title": "Anti-Pattern Label",
+          "description": "A short, recognizable name for this anti-pattern (e.g., \"Generic Dashboard Layout\", \"Decorative Animations\").",
+          "type": "string",
+          "minLength": 1
+        },
+        "description": {
+          "title": "Anti-Pattern Description",
+          "description": "What this anti-pattern looks like in practice — the design decision being prohibited.",
+          "type": "string"
+        },
+        "why_prohibited": {
+          "title": "Why Prohibited",
+          "description": "The reasoning for why this design approach is prohibited, referencing the ontology's principles and audience needs.",
+          "type": "string"
+        },
+        "traces_to": {
+          "title": "Traces To",
+          "description": "Array of node IDs whose principles this anti-pattern violates. Referential integrity: every ID must exist as a node key. Enforced programmatically.",
+          "type": "array",
+          "items": {
+            "$ref": "#/$defs/node_id"
+          },
+          "minItems": 1
+        }
+      }
+    },
+    "generation_instructions": {
+      "title": "Generation Instructions",
+      "description": "Optional instructions for AI agents on how to use this ontology during code generation. Includes a recommended process and an example traversal.",
+      "type": "object",
+      "additionalProperties": false,
+      "properties": {
+        "process": {
+          "title": "Generation Process",
+          "description": "Ordered list of steps an AI agent should follow when generating UI code using this ontology.",
+          "type": "array",
+          "items": {
+            "type": "string"
+          }
+        },
+        "example_traversal": {
+          "title": "Example Traversal",
+          "description": "A worked example showing how to traverse the ontology from intent to visual properties for a specific component.",
+          "type": "object",
+          "additionalProperties": true
+        }
+      }
+    }
+  }
+}
