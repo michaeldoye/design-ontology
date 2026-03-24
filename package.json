@@ -35,9 +35,9 @@
   "license": "MIT",
   "repository": {
     "type": "git",
-    "url": "git+https://github.com/design-ontology/design-ontology.git"
+    "url": "git+https://github.com/michaeldoye/design-ontology.git"
   },
-  "homepage": "https://github.com/design-ontology/design-ontology#readme",
+  "homepage": "https://github.com/michaeldoye/design-ontology#readme",
   "author": "design-ontology contributors",
   "engines": {
     "node": ">=20.0.0"
