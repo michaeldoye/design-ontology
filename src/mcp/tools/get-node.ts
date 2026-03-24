@@ -3,18 +3,37 @@ import type { McpServer } from "@modelcontextprotocol/sdk/server/mcp.js";
 import type { OntologyGraph } from "../../core/graph.js";
 import { getNode, getConnections, getChainsForNode } from "../../core/graph.js";
 
-export function registerGetNode(server: McpServer, graph: OntologyGraph): void {
+const NO_ONTOLOGY = {
+  content: [
+    {
+      type: "text" as const,
+      text: JSON.stringify({
+        error:
+          "No ontology loaded. Use generate_ontology to create one, or set ONTOLOGY_PATH.",
+      }),
+    },
+  ],
+};
+
+export function registerGetNode(
+  server: McpServer,
+  state: { graph: OntologyGraph | null }
+): void {
   server.registerTool(
     "get_node",
     {
       description:
         "Retrieve a design ontology node by ID. Returns the node's full description, reasoning, connections to other nodes, and which reasoning chains it participates in. Use this to understand WHY a specific design decision exists.",
       inputSchema: {
-        node_id: z.string().describe("The node ID to retrieve (e.g., INT-001, VIS-003)"),
+        node_id: z
+          .string()
+          .describe("The node ID to retrieve (e.g., INT-001, VIS-003)"),
       },
     },
     async ({ node_id }) => {
-      const node = getNode(graph, node_id);
+      if (!state.graph) return NO_ONTOLOGY;
+
+      const node = getNode(state.graph, node_id);
 
       if (!node) {
         return {
@@ -27,10 +46,10 @@ export function registerGetNode(server: McpServer, graph: OntologyGraph): void {
         };
       }
 
-      const domain = graph.domainIndex.get(node_id);
-      const incomingNodes = getConnections(graph, node_id, "in");
-      const outgoingNodes = getConnections(graph, node_id, "out");
-      const chains = getChainsForNode(graph, node_id);
+      const domain = state.graph.domainIndex.get(node_id);
+      const incomingNodes = getConnections(state.graph, node_id, "in");
+      const outgoingNodes = getConnections(state.graph, node_id, "out");
+      const chains = getChainsForNode(state.graph, node_id);
 
       const result = {
         ...node,
@@ -41,7 +60,9 @@ export function registerGetNode(server: McpServer, graph: OntologyGraph): void {
       };
 
       return {
-        content: [{ type: "text" as const, text: JSON.stringify(result, null, 2) }],
+        content: [
+          { type: "text" as const, text: JSON.stringify(result, null, 2) },
+        ],
       };
     }
   );

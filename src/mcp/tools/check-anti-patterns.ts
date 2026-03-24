@@ -3,9 +3,21 @@ import type { McpServer } from "@modelcontextprotocol/sdk/server/mcp.js";
 import type { OntologyGraph } from "../../core/graph.js";
 import { checkAntiPatterns } from "../../core/graph.js";
 
+const NO_ONTOLOGY = {
+  content: [
+    {
+      type: "text" as const,
+      text: JSON.stringify({
+        error:
+          "No ontology loaded. Use generate_ontology to create one, or set ONTOLOGY_PATH.",
+      }),
+    },
+  ],
+};
+
 export function registerCheckAntiPatterns(
   server: McpServer,
-  graph: OntologyGraph
+  state: { graph: OntologyGraph | null }
 ): void {
   server.registerTool(
     "check_anti_patterns",
@@ -21,7 +33,9 @@ export function registerCheckAntiPatterns(
       },
     },
     async ({ description }) => {
-      const matches = checkAntiPatterns(graph, description);
+      if (!state.graph) return NO_ONTOLOGY;
+
+      const matches = checkAntiPatterns(state.graph, description);
 
       if (matches.length === 0) {
         return {
@@ -48,7 +62,9 @@ export function registerCheckAntiPatterns(
       };
 
       return {
-        content: [{ type: "text" as const, text: JSON.stringify(result, null, 2) }],
+        content: [
+          { type: "text" as const, text: JSON.stringify(result, null, 2) },
+        ],
       };
     }
   );

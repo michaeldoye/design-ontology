@@ -3,6 +3,18 @@ import type { McpServer } from "@modelcontextprotocol/sdk/server/mcp.js";
 import type { OntologyGraph } from "../../core/graph.js";
 import type { DomainName } from "../../core/types.js";
 
+const NO_ONTOLOGY = {
+  content: [
+    {
+      type: "text" as const,
+      text: JSON.stringify({
+        error:
+          "No ontology loaded. Use generate_ontology to create one, or set ONTOLOGY_PATH.",
+      }),
+    },
+  ],
+};
+
 function traverseToTarget(
   graph: OntologyGraph,
   startIds: string[],
@@ -55,7 +67,10 @@ function traverseToTarget(
   };
 }
 
-export function registerTraverse(server: McpServer, graph: OntologyGraph): void {
+export function registerTraverse(
+  server: McpServer,
+  state: { graph: OntologyGraph | null }
+): void {
   server.registerTool(
     "traverse",
     {
@@ -78,13 +93,22 @@ export function registerTraverse(server: McpServer, graph: OntologyGraph): void 
       },
     },
     async ({ from_nodes, to_domain, max_depth }) => {
+      if (!state.graph) return NO_ONTOLOGY;
+
       const targetDomain = (to_domain ?? "visual_properties") as DomainName;
       const depth = max_depth ?? 6;
 
-      const result = traverseToTarget(graph, from_nodes, targetDomain, depth);
+      const result = traverseToTarget(
+        state.graph,
+        from_nodes,
+        targetDomain,
+        depth
+      );
 
       return {
-        content: [{ type: "text" as const, text: JSON.stringify(result, null, 2) }],
+        content: [
+          { type: "text" as const, text: JSON.stringify(result, null, 2) },
+        ],
       };
     }
   );

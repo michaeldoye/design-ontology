@@ -3,7 +3,22 @@ import type { McpServer } from "@modelcontextprotocol/sdk/server/mcp.js";
 import type { OntologyGraph } from "../../core/graph.js";
 import { getNode } from "../../core/graph.js";
 
-export function registerGetChain(server: McpServer, graph: OntologyGraph): void {
+const NO_ONTOLOGY = {
+  content: [
+    {
+      type: "text" as const,
+      text: JSON.stringify({
+        error:
+          "No ontology loaded. Use generate_ontology to create one, or set ONTOLOGY_PATH.",
+      }),
+    },
+  ],
+};
+
+export function registerGetChain(
+  server: McpServer,
+  state: { graph: OntologyGraph | null }
+): void {
   server.registerTool(
     "get_chain",
     {
@@ -21,6 +36,8 @@ export function registerGetChain(server: McpServer, graph: OntologyGraph): void 
       },
     },
     async ({ chain_id, chain_name }) => {
+      if (!state.graph) return NO_ONTOLOGY;
+
       if (!chain_id && !chain_name) {
         return {
           content: [
@@ -34,7 +51,7 @@ export function registerGetChain(server: McpServer, graph: OntologyGraph): void 
         };
       }
 
-      const chains = graph.ontology.edges.reasoning_chains;
+      const chains = state.graph.ontology.edges.reasoning_chains;
       let match = chain_id
         ? chains.find((c) => c.id === chain_id)
         : undefined;
@@ -60,7 +77,7 @@ export function registerGetChain(server: McpServer, graph: OntologyGraph): void 
       }
 
       const expandedPath = match.path.map((nodeId) => {
-        const node = getNode(graph, nodeId as string);
+        const node = getNode(state.graph!, nodeId as string);
         return node ?? { id: nodeId, error: "Node not found" };
       });
 
@@ -70,7 +87,9 @@ export function registerGetChain(server: McpServer, graph: OntologyGraph): void 
       };
 
       return {
-        content: [{ type: "text" as const, text: JSON.stringify(result, null, 2) }],
+        content: [
+          { type: "text" as const, text: JSON.stringify(result, null, 2) },
+        ],
       };
     }
   );

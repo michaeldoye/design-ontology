@@ -6,11 +6,24 @@ import {
   checkAntiPatterns,
   getChainsForNode,
 } from "../../core/graph.js";
-import type { BaseNode, ReasoningChain, AntiPattern } from "../../core/types.js";
+import type {
+  BaseNode,
+  ReasoningChain,
+  AntiPattern,
+} from "../../core/types.js";
 
-/**
- * Build a one-paragraph synthesis from matched nodes, chains, and anti-patterns.
- */
+const NO_ONTOLOGY = {
+  content: [
+    {
+      type: "text" as const,
+      text: JSON.stringify({
+        error:
+          "No ontology loaded. Use generate_ontology to create one, or set ONTOLOGY_PATH.",
+      }),
+    },
+  ],
+};
+
 function buildGuidance(
   component: string,
   matchedNodes: BaseNode[],
@@ -21,7 +34,6 @@ function buildGuidance(
 
   parts.push(`When building the "${component}" component:`);
 
-  // Collect key principles
   const principles = matchedNodes
     .map((n) => n.principle)
     .filter(Boolean)
@@ -30,7 +42,6 @@ function buildGuidance(
     parts.push(`Key principles: ${principles.join("; ")}.`);
   }
 
-  // Collect key implications
   const implications = matchedNodes
     .map((n) => n.implication)
     .filter(Boolean)
@@ -39,7 +50,6 @@ function buildGuidance(
     parts.push(`Design implications: ${implications.join("; ")}.`);
   }
 
-  // Collect specifications from visual property nodes
   const specs = matchedNodes
     .filter((n) => n.specification)
     .map((n) => `${n.label}: ${n.specification}`)
@@ -48,7 +58,6 @@ function buildGuidance(
     parts.push(`Specifications: ${specs.join("; ")}.`);
   }
 
-  // Anti-pattern warnings
   if (antiPatterns.length > 0) {
     const warnings = antiPatterns
       .map((ap) => `avoid "${ap.label}" (${ap.why_prohibited})`)
@@ -61,7 +70,7 @@ function buildGuidance(
 
 export function registerResolveForComponent(
   server: McpServer,
-  graph: OntologyGraph
+  state: { graph: OntologyGraph | null }
 ): void {
   server.registerTool(
     "resolve_for_component",
@@ -98,7 +107,9 @@ export function registerResolveForComponent(
       },
     },
     async ({ component, context }) => {
-      // 1. Semantic search for relevant nodes
+      if (!state.graph) return NO_ONTOLOGY;
+      const graph = state.graph;
+
       const componentMatches = searchNodes(graph, component);
 
       const contextMatches: BaseNode[] = [];
@@ -118,7 +129,6 @@ export function registerResolveForComponent(
         );
       }
 
-      // Deduplicate
       const allMatchedIds = new Set<string>();
       const allMatched: BaseNode[] = [];
       for (const node of [...componentMatches, ...contextMatches]) {
@@ -129,7 +139,6 @@ export function registerResolveForComponent(
         }
       }
 
-      // 2. Find visual properties via traversal from matched nodes
       const startIds = allMatched
         .map((n) => n.id as string)
         .filter(
@@ -138,7 +147,6 @@ export function registerResolveForComponent(
             graph.domainIndex.get(id) !== "accessibility"
         );
 
-      // BFS to visual properties
       const visualProps = new Map<string, BaseNode>();
 
       for (const startId of startIds) {
@@ -161,7 +169,6 @@ export function registerResolveForComponent(
         }
       }
 
-      // Also include directly matched visual property nodes
       for (const node of allMatched) {
         const id = node.id as string;
         if (graph.domainIndex.get(id) === "visual_properties") {
@@ -169,7 +176,6 @@ export function registerResolveForComponent(
         }
       }
 
-      // 3. Collect relevant chains
       const relevantChains = new Map<string, ReasoningChain>();
       for (const id of allMatchedIds) {
         for (const chain of getChainsForNode(graph, id)) {
@@ -177,16 +183,13 @@ export function registerResolveForComponent(
         }
       }
 
-      // 4. Check anti-patterns
       const antiPatternMatches = checkAntiPatterns(graph, component);
 
-      // 5. Build reasoning summary
       const reasoningParts = allMatched
         .map((n) => n.reasoning)
         .filter(Boolean) as string[];
       const reasoningSummary = reasoningParts.join(" ");
 
-      // 6. Build generation guidance
       const guidance = buildGuidance(
         component,
         [...allMatched, ...visualProps.values()],
@@ -203,7 +206,9 @@ export function registerResolveForComponent(
       };
 
       return {
-        content: [{ type: "text" as const, text: JSON.stringify(result, null, 2) }],
+        content: [
+          { type: "text" as const, text: JSON.stringify(result, null, 2) },
+        ],
       };
     }
   );

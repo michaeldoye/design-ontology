@@ -4,7 +4,22 @@ import type { OntologyGraph } from "../../core/graph.js";
 import type { DomainName } from "../../core/types.js";
 import { searchNodes } from "../../core/graph.js";
 
-export function registerSearch(server: McpServer, graph: OntologyGraph): void {
+const NO_ONTOLOGY = {
+  content: [
+    {
+      type: "text" as const,
+      text: JSON.stringify({
+        error:
+          "No ontology loaded. Use generate_ontology to create one, or set ONTOLOGY_PATH.",
+      }),
+    },
+  ],
+};
+
+export function registerSearch(
+  server: McpServer,
+  state: { graph: OntologyGraph | null }
+): void {
   server.registerTool(
     "search",
     {
@@ -21,12 +36,14 @@ export function registerSearch(server: McpServer, graph: OntologyGraph): void {
       },
     },
     async ({ query, domain }) => {
+      if (!state.graph) return NO_ONTOLOGY;
+
       const domainFilter = domain as DomainName | undefined;
-      const results = searchNodes(graph, query, domainFilter);
+      const results = searchNodes(state.graph, query, domainFilter);
 
       const enriched = results.map((node) => ({
         ...node,
-        domain: graph.domainIndex.get(node.id as string),
+        domain: state.graph!.domainIndex.get(node.id as string),
       }));
 
       return {

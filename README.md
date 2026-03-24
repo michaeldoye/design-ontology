@@ -6,27 +6,7 @@ Design tokens tell machines what values to use. Design systems tell them what to
 
 ## Setup
 
-### Step 1: Generate your ontology
-
-Write a [product spec](docs/writing-specs.md) describing your product's audience, goals, culture, and constraints. Then generate an ontology from it:
-
-```bash
-npx design-ontology init spec.md
-```
-
-The CLI will prompt you for an API key on first run (Anthropic or OpenAI) and save it for future use. You can also set `ANTHROPIC_API_KEY` or `OPENAI_API_KEY` as environment variables.
-
-This outputs a `design-ontology.json` file — a knowledge graph encoding the reasoning behind your product's design decisions.
-
-### Step 2: Validate
-
-```bash
-npx design-ontology validate
-```
-
-### Step 3: Connect to your IDE
-
-Add the MCP server config so AI agents can query the ontology while generating code.
+### Step 1: Add the MCP server to your IDE
 
 **Claude Code** — add `.mcp.json` to your project root:
 
@@ -35,10 +15,7 @@ Add the MCP server config so AI agents can query the ontology while generating c
   "mcpServers": {
     "design-ontology": {
       "command": "npx",
-      "args": ["-y", "design-ontology"],
-      "env": {
-        "ONTOLOGY_PATH": "./design-ontology.json"
-      }
+      "args": ["-y", "design-ontology"]
     }
   }
 }
@@ -47,49 +24,37 @@ Add the MCP server config so AI agents can query the ontology while generating c
 <details>
 <summary>Cursor, Windsurf, VS Code</summary>
 
-**Cursor** — add `.cursor/mcp.json`:
-
+**Cursor** — `.cursor/mcp.json`:
 ```json
 {
   "mcpServers": {
     "design-ontology": {
       "command": "npx",
-      "args": ["-y", "design-ontology"],
-      "env": {
-        "ONTOLOGY_PATH": "./design-ontology.json"
-      }
+      "args": ["-y", "design-ontology"]
     }
   }
 }
 ```
 
-**Windsurf** — add to your Windsurf MCP configuration:
-
+**Windsurf** — MCP configuration:
 ```json
 {
   "mcpServers": {
     "design-ontology": {
       "command": "npx",
-      "args": ["-y", "design-ontology"],
-      "env": {
-        "ONTOLOGY_PATH": "./design-ontology.json"
-      }
+      "args": ["-y", "design-ontology"]
     }
   }
 }
 ```
 
-**VS Code** — add `.vscode/mcp.json`:
-
+**VS Code** — `.vscode/mcp.json`:
 ```json
 {
   "servers": {
     "design-ontology": {
       "command": "npx",
-      "args": ["-y", "design-ontology"],
-      "env": {
-        "ONTOLOGY_PATH": "./design-ontology.json"
-      }
+      "args": ["-y", "design-ontology"]
     }
   }
 }
@@ -97,23 +62,25 @@ Add the MCP server config so AI agents can query the ontology while generating c
 
 </details>
 
-### Step 4: Use it
+### Step 2: Generate your ontology
 
-Ask your AI agent to build a component. The MCP server gives it access to your ontology's reasoning, visual properties, and anti-patterns automatically.
+Ask your AI agent:
 
-To verify it's working, ask: *"Using the design ontology, what visual properties apply to the primary user intent?"*
+> Read my product spec (spec.md) and use the generate_ontology tool to create a design ontology for this product.
+
+The agent generates the ontology itself — no API keys or external accounts needed. It validates and saves a `design-ontology.json` in your project.
+
+### Step 3: Build with it
+
+The MCP server automatically loads your ontology. When you ask your AI agent to build UI components, it can query the ontology for design reasoning, visual properties, and anti-patterns.
+
+Try: *"Using the design ontology, build a risk assessment card component."*
 
 ---
 
 ## How it works
 
-```
-spec.md  -->  npx design-ontology init  -->  design-ontology.json  -->  MCP Server  -->  AI agent
-```
-
-The ontology is a JSON knowledge graph. Nodes represent design concepts across seven domains. Reasoning chains connect them into traversable paths from user intent to visual output. The MCP server exposes this graph as queryable tools.
-
-### The seven domains
+The ontology is a JSON knowledge graph. Nodes represent design concepts across seven domains. Reasoning chains connect them into traversable paths from user intent to visual output.
 
 | Domain | Prefix | What it encodes |
 |---|---|---|
@@ -129,12 +96,12 @@ The ontology is a JSON knowledge graph. Nodes represent design concepts across s
 
 **Anti-patterns** encode what NOT to do, with reasoning for why.
 
-### MCP tools
-
-The MCP server exposes six tools to AI agents:
+## MCP tools
 
 | Tool | Description |
 |---|---|
+| `generate_ontology` | Generate an ontology from a product spec (the agent does the generation) |
+| `save_ontology` | Validate and save generated ontology JSON to disk |
 | `get_node` | Retrieve a node by ID with its description, reasoning, and connections |
 | `get_chain` | Retrieve a reasoning chain with every node expanded |
 | `traverse` | Walk the graph from starting nodes to a target domain |
@@ -142,25 +109,27 @@ The MCP server exposes six tools to AI agents:
 | `resolve_for_component` | Describe what you're building, get all relevant reasoning and properties |
 | `search` | Free-text search across nodes, optionally filtered by domain |
 
-## CLI reference
+## CLI
+
+The CLI is available for scripting and CI workflows. The `init` and `update` commands require an LLM API key (Anthropic or OpenAI).
 
 ```bash
-npx design-ontology init [spec-file]        # Generate ontology from spec (LLM)
+npx design-ontology init [spec-file]        # Generate ontology via LLM API
 npx design-ontology validate [ontology-file] # Validate against schema
-npx design-ontology update [ontology-file]   # Evolve ontology with a change description
+npx design-ontology update [ontology-file]   # Evolve ontology via LLM API
 ```
 
-Use `--help` on any command for full options.
+## Writing good product specs
 
-## Why?
-
-Every AI tool produces the same UI because models have no access to design reasoning — only tokens and component names. Design ontology encodes the *why*: the psychology, culture, audience, and intent behind every visual decision, in a format machines can traverse.
-
-See [docs/philosophy.md](docs/philosophy.md) for the full argument.
+The ontology is only as good as the spec. Include: target audience (who, expertise, constraints), core user flows, brand/tone, cultural context, accessibility needs, and what the product is NOT. See [docs/writing-specs.md](docs/writing-specs.md).
 
 ## Examples
 
-See [`examples/ecovoorscan/`](examples/ecovoorscan/) for a complete ontology built for a Dutch sustainability assessment platform — 31 nodes, 8 reasoning chains, 6 anti-patterns.
+See [`examples/ecovoorscan/`](examples/ecovoorscan/) — a complete ontology for a Dutch sustainability assessment platform (31 nodes, 8 chains, 6 anti-patterns).
+
+## Philosophy
+
+See [docs/philosophy.md](docs/philosophy.md) for why this exists.
 
 ## License
 
