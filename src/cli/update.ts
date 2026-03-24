@@ -4,6 +4,7 @@ import { validateOntology } from "../core/validator.js";
 import type { DesignOntology, DomainName } from "../core/types.js";
 import { UPDATE_ONTOLOGY_SYSTEM_PROMPT } from "./prompts/update-ontology.js";
 import { callLlm, type LlmOptions } from "./llm.js";
+import { resolveApiKey } from "./config.js";
 
 const DOMAIN_NAMES: DomainName[] = [
   "intents",
@@ -137,32 +138,21 @@ export function registerUpdateCommand(program: Command): void {
         process.exit(1);
       }
 
-      // Resolve API key
-      const apiKey =
-        opts.apiKey ??
-        (opts.provider === "anthropic"
-          ? process.env.ANTHROPIC_API_KEY
-          : process.env.OPENAI_API_KEY);
-
-      if (!apiKey) {
-        const envVar =
-          opts.provider === "anthropic"
-            ? "ANTHROPIC_API_KEY"
-            : "OPENAI_API_KEY";
-        process.stderr.write(
-          `Error: No API key provided. Pass --api-key or set ${envVar}\n`
-        );
-        process.exit(1);
-      }
+      // Resolve API key — env vars, saved config, or interactive prompt
+      const resolved = await resolveApiKey({
+        apiKey: opts.apiKey,
+        provider: opts.provider,
+      });
+      const { apiKey, provider } = resolved;
 
       const model =
         opts.model ??
-        (opts.provider === "anthropic"
+        (provider === "anthropic"
           ? "claude-sonnet-4-20250514"
           : "gpt-4o");
 
       const llmOpts: LlmOptions = {
-        provider: opts.provider,
+        provider,
         model,
         apiKey,
         verbose: opts.verbose,

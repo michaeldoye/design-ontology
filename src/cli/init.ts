@@ -7,6 +7,7 @@ import {
   GENERATE_ONTOLOGY_RETRY_PROMPT,
 } from "./prompts/generate-ontology.js";
 import { callLlm, type LlmOptions } from "./llm.js";
+import { resolveApiKey } from "./config.js";
 
 const SPEC_CANDIDATES = [
   "spec.md",
@@ -122,39 +123,22 @@ export function registerInitCommand(program: Command): void {
         process.exit(0);
       }
 
-      // Resolve API key
-      const apiKey =
-        opts.apiKey ??
-        (opts.provider === "anthropic"
-          ? process.env.ANTHROPIC_API_KEY
-          : process.env.OPENAI_API_KEY);
-
-      if (!apiKey) {
-        const envVar =
-          opts.provider === "anthropic"
-            ? "ANTHROPIC_API_KEY"
-            : "OPENAI_API_KEY";
-        process.stderr.write(
-          `\ndesign-ontology init generates a design ontology from your product spec\n` +
-            `by calling an LLM (${opts.provider}). An API key is required.\n\n` +
-            `Provide one of:\n` +
-            `  export ${envVar}=<your-key>\n` +
-            `  npx design-ontology init --api-key <your-key>\n` +
-            `  npx design-ontology init --provider openai   (uses OPENAI_API_KEY)\n\n` +
-            `Use --dry-run to preview the prompt without calling the API.\n`
-        );
-        process.exit(1);
-      }
+      // Resolve API key — env vars, saved config, or interactive prompt
+      const resolved = await resolveApiKey({
+        apiKey: opts.apiKey,
+        provider: opts.provider,
+      });
+      const { apiKey, provider } = resolved;
 
       // Resolve model
       const model =
         opts.model ??
-        (opts.provider === "anthropic"
+        (provider === "anthropic"
           ? "claude-sonnet-4-20250514"
           : "gpt-4o");
 
       const llmOpts: LlmOptions = {
-        provider: opts.provider,
+        provider,
         model,
         apiKey,
         verbose: opts.verbose,

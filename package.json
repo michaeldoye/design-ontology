@@ -1,6 +1,6 @@
 {
   "name": "design-ontology",
-  "version": "0.1.1",
+  "version": "0.1.2",
   "description": "An open specification and toolchain for teaching AI agents why behind design decisions, not just what.",
   "type": "module",
   "bin": {

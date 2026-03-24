@@ -26,10 +26,16 @@ Then configure the MCP server in your IDE to make the ontology queryable by AI a
 If you don't have an ontology yet, `init` can generate one from a product spec by calling an LLM. This is the only command that requires an API key.
 
 ```bash
-export ANTHROPIC_API_KEY=your-key-here    # or OPENAI_API_KEY with --provider openai
+# Set either key — the CLI auto-detects which provider to use
+export ANTHROPIC_API_KEY=your-key-here    # uses Claude
+# or
+export OPENAI_API_KEY=your-key-here       # uses GPT-4o
+
 npx design-ontology init spec.md          # reads your spec, outputs design-ontology.json
 npx design-ontology validate              # check it against the schema
 ```
+
+The CLI auto-detects whichever API key you have set. You can also pass `--api-key <key>` directly.
 
 Use `--dry-run` to preview the prompt without making an API call. See [docs/writing-specs.md](docs/writing-specs.md) for guidance on writing specs that produce good ontologies.
 
