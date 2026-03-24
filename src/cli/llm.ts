@@ -16,10 +16,69 @@ export async function callLlm(
   userMessage: string,
   opts: LlmOptions
 ): Promise<LlmResponse> {
-  if (opts.provider === "anthropic") {
-    return callAnthropic(systemPrompt, userMessage, opts);
+  try {
+    if (opts.provider === "anthropic") {
+      return await callAnthropic(systemPrompt, userMessage, opts);
+    }
+    return await callOpenAI(systemPrompt, userMessage, opts);
+  } catch (err: unknown) {
+    handleApiError(err, opts.provider);
   }
-  return callOpenAI(systemPrompt, userMessage, opts);
+}
+
+function handleApiError(err: unknown, provider: string): never {
+  const error = err as Record<string, unknown>;
+
+  // Extract the human-readable message from SDK errors
+  let message = "";
+  if (error.error && typeof error.error === "object") {
+    const inner = error.error as Record<string, unknown>;
+    if (inner.error && typeof inner.error === "object") {
+      // Anthropic: { error: { error: { message: "..." } } }
+      message = (inner.error as Record<string, unknown>).message as string;
+    } else if (inner.message) {
+      message = inner.message as string;
+    }
+  }
+  if (!message && error.message) {
+    message = error.message as string;
+  }
+
+  const status = error.status as number | undefined;
+
+  // Provide actionable guidance for common errors
+  if (status === 400 && message.includes("credit balance")) {
+    process.stderr.write(
+      `\nError: ${provider} API credit balance is too low.\n\n` +
+        `Note: A Claude Pro subscription (claude.ai) is separate from the\n` +
+        `Anthropic API (console.anthropic.com). The API requires its own credits.\n\n` +
+        `  Anthropic: https://console.anthropic.com/settings/billing\n` +
+        `  OpenAI:    https://platform.openai.com/settings/organization/billing\n\n` +
+        `Or switch providers:\n` +
+        `  npx design-ontology init --provider openai\n`
+    );
+  } else if (status === 401) {
+    process.stderr.write(
+      `\nError: Invalid ${provider} API key.\n\n` +
+        `Check your key and try again. You can reset it with:\n` +
+        `  npx design-ontology init --api-key <new-key>\n`
+    );
+  } else if (status === 429) {
+    process.stderr.write(
+      `\nError: ${provider} API rate limit exceeded.\n\n` +
+        `Wait a moment and try again, or check your usage limits:\n` +
+        `  Anthropic: https://console.anthropic.com/settings/limits\n` +
+        `  OpenAI:    https://platform.openai.com/settings/organization/limits\n`
+    );
+  } else if (message) {
+    process.stderr.write(`\nError from ${provider} API: ${message}\n`);
+  } else {
+    process.stderr.write(
+      `\nError: ${provider} API request failed (${status ?? "unknown"}).\n`
+    );
+  }
+
+  process.exit(1);
 }
 
 async function callAnthropic(
