@@ -4,8 +4,8 @@
   "description": "An open specification and toolchain for teaching AI agents why behind design decisions, not just what.",
   "type": "module",
   "bin": {
-    "design-ontology": "./dist/cli/index.js",
-    "design-ontology-mcp": "./dist/mcp/index.js"
+    "design-ontology": "dist/cli/index.js",
+    "design-ontology-mcp": "dist/mcp/index.js"
   },
   "exports": {
     ".": "./dist/index.js",
