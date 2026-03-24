@@ -1,5 +1,5 @@
 import { defineConfig } from "tsup";
-import { readFileSync, writeFileSync } from "fs";
+import { readFileSync, writeFileSync, chmodSync } from "fs";
 import { join } from "path";
 
 const SHEBANG = "#!/usr/bin/env node\n";
@@ -16,13 +16,14 @@ export default defineConfig({
   clean: true,
   target: "node20",
   onSuccess: async () => {
-    // Add shebang to CLI and MCP entry points
+    // Add shebang and make executable for CLI and MCP entry points
     for (const file of ["dist/cli/index.js", "dist/mcp/index.js"]) {
       const path = join(process.cwd(), file);
       const content = readFileSync(path, "utf-8");
       if (!content.startsWith("#!")) {
         writeFileSync(path, SHEBANG + content);
       }
+      chmodSync(path, 0o755);
     }
   },
 });
