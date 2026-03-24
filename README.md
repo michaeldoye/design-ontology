@@ -15,7 +15,7 @@ Design tokens tell machines what values to use. Design systems tell them what to
   "mcpServers": {
     "design-ontology": {
       "command": "npx",
-      "args": ["-y", "design-ontology"]
+      "args": ["-y", "-p", "design-ontology", "design-ontology-mcp"]
     }
   }
 }
@@ -30,7 +30,7 @@ Design tokens tell machines what values to use. Design systems tell them what to
   "mcpServers": {
     "design-ontology": {
       "command": "npx",
-      "args": ["-y", "design-ontology"]
+      "args": ["-y", "-p", "design-ontology", "design-ontology-mcp"]
     }
   }
 }
@@ -42,7 +42,7 @@ Design tokens tell machines what values to use. Design systems tell them what to
   "mcpServers": {
     "design-ontology": {
       "command": "npx",
-      "args": ["-y", "design-ontology"]
+      "args": ["-y", "-p", "design-ontology", "design-ontology-mcp"]
     }
   }
 }
@@ -54,7 +54,7 @@ Design tokens tell machines what values to use. Design systems tell them what to
   "servers": {
     "design-ontology": {
       "command": "npx",
-      "args": ["-y", "design-ontology"]
+      "args": ["-y", "-p", "design-ontology", "design-ontology-mcp"]
     }
   }
 }

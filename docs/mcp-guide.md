@@ -36,10 +36,7 @@ Create a `.mcp.json` file at your project root:
   "mcpServers": {
     "design-ontology": {
       "command": "npx",
-      "args": ["-y", "design-ontology"],
-      "env": {
-        "ONTOLOGY_PATH": "./design-ontology.json"
-      }
+      "args": ["-y", "-p", "design-ontology", "design-ontology-mcp"]
     }
   }
 }
@@ -48,7 +45,7 @@ Create a `.mcp.json` file at your project root:
 #### Option B: CLI command
 
 ```bash
-claude mcp add design-ontology -- npx -y design-ontology
+claude mcp add design-ontology -- npx -y -p design-ontology design-ontology-mcp
 ```
 
 When using the CLI command, set the `ONTOLOGY_PATH` environment variable in your shell or `.env` file before starting Claude Code.
@@ -76,10 +73,7 @@ Create a `.cursor/mcp.json` file in your project:
   "mcpServers": {
     "design-ontology": {
       "command": "npx",
-      "args": ["-y", "design-ontology"],
-      "env": {
-        "ONTOLOGY_PATH": "./design-ontology.json"
-      }
+      "args": ["-y", "-p", "design-ontology", "design-ontology-mcp"]
     }
   }
 }
@@ -112,10 +106,7 @@ Configure the MCP server through Windsurf settings:
   "mcpServers": {
     "design-ontology": {
       "command": "npx",
-      "args": ["-y", "design-ontology"],
-      "env": {
-        "ONTOLOGY_PATH": "./design-ontology.json"
-      }
+      "args": ["-y", "-p", "design-ontology", "design-ontology-mcp"]
     }
   }
 }
@@ -144,10 +135,7 @@ Create a `.vscode/mcp.json` file in your project:
   "servers": {
     "design-ontology": {
       "command": "npx",
-      "args": ["-y", "design-ontology"],
-      "env": {
-        "ONTOLOGY_PATH": "./design-ontology.json"
-      }
+      "args": ["-y", "-p", "design-ontology", "design-ontology-mcp"]
     }
   }
 }

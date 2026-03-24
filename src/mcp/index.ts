@@ -63,7 +63,7 @@ if (existsSync(ontologyPath)) {
 
 const server = new McpServer({
   name: "design-ontology",
-  version: "0.1.5",
+  version: "0.1.6",
 });
 
 // Register generate/save tools (always available)

@@ -11,7 +11,8 @@
       "Bash(npx vitest:*)",
       "Bash(npm run:*)",
       "Bash(wc:*)",
-      "Bash(npm version:*)"
+      "Bash(npm version:*)",
+      "Bash(npx design-ontology-mcp:*)"
     ]
   }
 }
