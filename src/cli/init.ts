@@ -90,9 +90,13 @@ export function registerInitCommand(program: Command): void {
       const resolvedSpec = specFile ?? findSpec();
       if (!resolvedSpec) {
         process.stderr.write(
-          `Error: No spec file provided and none found in current directory.\n` +
-            `Looked for: ${SPEC_CANDIDATES.join(", ")}\n` +
-            `Provide a path: npx design-ontology init <spec-file>\n`
+          `\ndesign-ontology init generates a design ontology from your product spec.\n\n` +
+            `No spec file found in the current directory.\n` +
+            `Looked for: ${SPEC_CANDIDATES.join(", ")}\n\n` +
+            `Either provide a path:\n` +
+            `  npx design-ontology init ./path/to/spec.md\n\n` +
+            `Or create a spec file in this directory. See:\n` +
+            `  https://github.com/michaeldoye/design-ontology/blob/main/docs/writing-specs.md\n`
         );
         process.exit(1);
       }
@@ -131,7 +135,13 @@ export function registerInitCommand(program: Command): void {
             ? "ANTHROPIC_API_KEY"
             : "OPENAI_API_KEY";
         process.stderr.write(
-          `Error: No API key provided. Pass --api-key or set ${envVar}\n`
+          `\ndesign-ontology init generates a design ontology from your product spec\n` +
+            `by calling an LLM (${opts.provider}). An API key is required.\n\n` +
+            `Provide one of:\n` +
+            `  export ${envVar}=<your-key>\n` +
+            `  npx design-ontology init --api-key <your-key>\n` +
+            `  npx design-ontology init --provider openai   (uses OPENAI_API_KEY)\n\n` +
+            `Use --dry-run to preview the prompt without calling the API.\n`
         );
         process.exit(1);
       }

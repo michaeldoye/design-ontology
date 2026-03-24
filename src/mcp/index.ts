@@ -47,7 +47,7 @@ process.stderr.write(
 
 const server = new McpServer({
   name: "design-ontology",
-  version: "0.1.0",
+  version: "0.1.1",
 });
 
 // Register all tools

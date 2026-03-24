@@ -15,14 +15,23 @@ Every AI code-generation tool produces the same UI. Ask for a "dashboard" and yo
 ## Quick start
 
 ```bash
-# Scaffold a design-ontology.json from a product spec or description
-npx design-ontology init
-
-# Validate the ontology against the JSON Schema
-npx design-ontology validate
-
-# Or point the MCP server at your ontology (see IDE Setup below)
+# Validate an existing ontology
+npx design-ontology validate ./design-ontology.json
 ```
+
+Then configure the MCP server in your IDE to make the ontology queryable by AI agents (see [IDE Setup](#ide-setup) below).
+
+### Generating an ontology from a product spec
+
+If you don't have an ontology yet, `init` can generate one from a product spec by calling an LLM. This is the only command that requires an API key.
+
+```bash
+export ANTHROPIC_API_KEY=your-key-here    # or OPENAI_API_KEY with --provider openai
+npx design-ontology init spec.md          # reads your spec, outputs design-ontology.json
+npx design-ontology validate              # check it against the schema
+```
+
+Use `--dry-run` to preview the prompt without making an API call. See [docs/writing-specs.md](docs/writing-specs.md) for guidance on writing specs that produce good ontologies.
 
 ## How it works
 
