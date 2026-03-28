@@ -72,7 +72,23 @@ The agent generates the ontology itself — no API keys or external accounts nee
 
 ### Step 3: Build with it
 
-The MCP server automatically loads your ontology. When you ask your AI agent to build UI components, it can query the ontology for design reasoning, visual properties, and anti-patterns.
+The MCP server automatically loads `design-ontology.json` from your project root. When you ask your AI agent to build UI components, it can query the ontology for design reasoning, visual properties, and anti-patterns.
+
+If your ontology file is at a different path, set the `ONTOLOGY_PATH` environment variable in your MCP config:
+
+```json
+{
+  "mcpServers": {
+    "design-ontology": {
+      "command": "npx",
+      "args": ["-y", "-p", "design-ontology", "design-ontology-mcp"],
+      "env": {
+        "ONTOLOGY_PATH": "./path/to/your/design-ontology.json"
+      }
+    }
+  }
+}
+```
 
 Try: *"Using the design ontology, build a risk assessment card component."*
 

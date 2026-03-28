@@ -17,7 +17,7 @@ The **design-ontology** MCP (Model Context Protocol) server loads a design ontol
 
 | Variable | Required | Description |
 |----------|----------|-------------|
-| `ONTOLOGY_PATH` | Yes | Path to your `design-ontology.json` file. Relative paths are resolved from the project root. |
+| `ONTOLOGY_PATH` | No | Path to your `design-ontology.json` file. Defaults to `./design-ontology.json`. Relative paths are resolved from the project root. |
 
 ---
 
